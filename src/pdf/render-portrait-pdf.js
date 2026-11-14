@@ -1,5 +1,5 @@
-import { LineCapStyle, PDFDocument, PDFString, rgb } from '../vendor/pdf-lib.esm.js';
-import fontkit from '../vendor/fontkit.esm.js';
+import fontkit from '@pdf-lib/fontkit';
+import { LineCapStyle, PDFDocument, PDFString, rgb } from 'pdf-lib';
 import { formatExportedLine, formatGenerationNumber, formatRelation, formatSubtitle } from './languages.js';
 import { parseHex, pickAccentColor, pickBandColor, pickBoxColors } from './color-schemes.js';
 import { layoutPortraitTree } from './portrait-layout.js';

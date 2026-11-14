@@ -1,5 +1,16 @@
 {
   "name": "family-tree-exporter",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@expo-google-fonts/noto-sans": "^0.4.2",
+    "esbuild": "^0.28.2"
+  }
 }

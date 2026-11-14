@@ -45,14 +45,14 @@ function findRootName(tree) {
 
 async function loadFontBytes() {
   const [regular, bold] = await Promise.all([
-    fetchBytes('../../assets/fonts/NotoSans-Regular.ttf'),
-    fetchBytes('../../assets/fonts/NotoSans-Bold.ttf'),
+    fetchBytes('assets/fonts/NotoSans-Regular.ttf'),
+    fetchBytes('assets/fonts/NotoSans-Bold.ttf'),
   ]);
   return { regular, bold };
 }
 
-async function fetchBytes(relativePath) {
-  const response = await fetch(new URL(relativePath, import.meta.url));
+async function fetchBytes(extensionPath) {
+  const response = await fetch(chrome.runtime.getURL(extensionPath));
   return response.arrayBuffer();
 }
 
