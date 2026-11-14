@@ -1,4 +1,4 @@
-import { LineCapStyle, PDFDocument, rgb } from '../vendor/pdf-lib.esm.js';
+import { LineCapStyle, PDFDocument, PDFString, rgb } from '../vendor/pdf-lib.esm.js';
 import fontkit from '../vendor/fontkit.esm.js';
 import { relationLabel } from './generation-labels.js';
 import { parseHex, pickAccentColor, pickBandColor, pickBoxColors } from './color-schemes.js';
@@ -33,13 +33,14 @@ export async function renderPortraitPdf({ tree, colorScheme, detail, fontBytes, 
     bold: await document.embedFont(fontBytes.bold, { subset: false }),
   };
   const page = document.addPage([layout.width, layout.height]);
-  const canvas = { page, fonts, layout, colorScheme };
+  const canvas = { document, page, fonts, layout, colorScheme };
 
   drawBackground(canvas);
   drawBanner({ canvas, tree, exportedAt });
   drawGenerationRows(canvas);
   drawLinks(canvas);
   drawBoxes({ canvas, detail });
+  linkBannerToStartPerson({ canvas, tree });
   shrinkToFitPageLimit({ page, layout });
 
   return document.save();
@@ -158,7 +159,37 @@ function drawBoxes({ canvas, detail }) {
     drawBox({ canvas, box, fill: colors.fill });
     drawAccentStripe({ canvas, box });
     drawBoxText({ canvas, box, colors, detail });
+    addLinkAnnotation({
+      canvas,
+      area: { x: box.x, y: box.y, width: box.width, height: box.height },
+      url: personUrl(box.person.id),
+    });
   }
+}
+
+function linkBannerToStartPerson({ canvas, tree }) {
+  const { layout } = canvas;
+  addLinkAnnotation({
+    canvas,
+    area: { x: 0, y: 0, width: layout.width, height: layout.bannerHeight },
+    url: personUrl(tree.rootId),
+  });
+}
+
+function personUrl(personId) {
+  return `https://www.familysearch.org/en/tree/person/details/${personId}`;
+}
+
+function addLinkAnnotation({ canvas, area, url }) {
+  const { document, page, layout } = canvas;
+  const annotation = document.context.obj({
+    Type: 'Annot',
+    Subtype: 'Link',
+    Rect: [area.x, layout.height - area.y - area.height, area.x + area.width, layout.height - area.y],
+    Border: [0, 0, 0],
+    A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) },
+  });
+  page.node.addAnnot(document.context.register(annotation));
 }
 
 function drawBox({ canvas, box, fill }) {
