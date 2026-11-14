@@ -1,6 +1,6 @@
 import { LineCapStyle, PDFDocument, PDFString, rgb } from '../vendor/pdf-lib.esm.js';
 import fontkit from '../vendor/fontkit.esm.js';
-import { relationLabel } from './generation-labels.js';
+import { formatExportedLine, formatGenerationNumber, formatRelation, formatSubtitle } from './languages.js';
 import { parseHex, pickAccentColor, pickBandColor, pickBoxColors } from './color-schemes.js';
 import { layoutPortraitTree } from './portrait-layout.js';
 
@@ -19,12 +19,13 @@ const CONNECTOR_THICKNESS = 1.2;
  *   tree: import('../crawler/crawl-ancestry.js').AncestryTree,
  *   colorScheme: import('./color-schemes.js').ColorScheme,
  *   detail: 'compact' | 'detailed',
+ *   language: import('./languages.js').Language,
  *   fontBytes: { regular: ArrayBuffer | Uint8Array, bold: ArrayBuffer | Uint8Array },
  *   exportedAt: Date
  * }} request
  * @returns {Promise<Uint8Array>} the PDF file
  */
-export async function renderPortraitPdf({ tree, colorScheme, detail, fontBytes, exportedAt }) {
+export async function renderPortraitPdf({ tree, colorScheme, detail, language, fontBytes, exportedAt }) {
   const layout = layoutPortraitTree({ tree, detail });
   const document = await PDFDocument.create();
   document.registerFontkit(fontkit);
@@ -33,7 +34,7 @@ export async function renderPortraitPdf({ tree, colorScheme, detail, fontBytes, 
     bold: await document.embedFont(fontBytes.bold, { subset: false }),
   };
   const page = document.addPage([layout.width, layout.height]);
-  const canvas = { document, page, fonts, layout, colorScheme };
+  const canvas = { document, page, fonts, layout, colorScheme, language };
 
   drawBackground(canvas);
   drawBanner({ canvas, tree, exportedAt });
@@ -51,7 +52,7 @@ function drawBackground({ page, layout, colorScheme }) {
 }
 
 function drawBanner({ canvas, tree, exportedAt }) {
-  const { page, fonts, layout, colorScheme } = canvas;
+  const { page, fonts, layout, colorScheme, language } = canvas;
   const root = tree.people.find((person) => person.id === tree.rootId);
   const textColor = toColor(colorScheme.bannerText);
   const maxWidth = layout.width - layout.margin * 2;
@@ -64,7 +65,7 @@ function drawBanner({ canvas, tree, exportedAt }) {
   });
   const [title] = fitLines({ text: root?.name ?? tree.rootId, font: fonts.bold, size: 26, maxWidth, maxLines: 1 });
   page.drawText(title, { x: layout.margin, y: layout.height - 48, font: fonts.bold, size: 26, color: textColor });
-  page.drawText(`Pedigree  ·  ${tree.people.length} people  ·  ${tree.generationCount} generations`, {
+  page.drawText(formatSubtitle({ language, peopleCount: tree.people.length, generationCount: tree.generationCount }), {
     x: layout.margin,
     y: layout.height - 72,
     font: fonts.regular,
@@ -72,7 +73,7 @@ function drawBanner({ canvas, tree, exportedAt }) {
     color: textColor,
     opacity: 0.8,
   });
-  const exportedText = `Exported ${formatDate(exportedAt)}`;
+  const exportedText = formatExportedLine({ language, date: exportedAt });
   page.drawText(exportedText, {
     x: layout.width - layout.margin - fonts.regular.widthOfTextAtSize(exportedText, 10),
     y: layout.height - 72,
@@ -83,11 +84,7 @@ function drawBanner({ canvas, tree, exportedAt }) {
   });
 }
 
-function formatDate(date) {
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-function drawGenerationRows({ page, fonts, layout, colorScheme }) {
+function drawGenerationRows({ page, fonts, layout, colorScheme, language }) {
   const bandWidth = layout.width - layout.margin;
   for (const row of layout.rows) {
     page.drawSvgPath(roundedRectanglePath({ width: bandWidth, height: row.height + BAND_OVERHANG * 2, radius: BAND_RADIUS }), {
@@ -96,16 +93,17 @@ function drawGenerationRows({ page, fonts, layout, colorScheme }) {
       color: toColor(pickBandColor(colorScheme)),
       borderWidth: 0,
     });
-    drawRowLabel({ canvas: { page, fonts, layout, colorScheme }, row });
+    drawRowLabel({ canvas: { page, fonts, layout, colorScheme, language }, row });
   }
 }
 
 function drawRowLabel({ canvas, row }) {
-  const { page, fonts, layout, colorScheme } = canvas;
-  const nameLines = fitLines({ text: relationLabel(row.generation), font: fonts.bold, size: 9, maxWidth: layout.labelWidth, maxLines: 2 });
+  const { page, fonts, layout, colorScheme, language } = canvas;
+  const relation = formatRelation({ language, generation: row.generation });
+  const nameLines = fitLines({ text: relation, font: fonts.bold, size: 9, maxWidth: layout.labelWidth, maxLines: 2 });
   const lines = [
     ...nameLines.map((text) => ({ text, font: fonts.bold, size: 9, lineHeight: 11 })),
-    { text: `Generation ${row.generation}`, font: fonts.regular, size: 7.5, lineHeight: 10 },
+    { text: formatGenerationNumber({ language, generation: row.generation }), font: fonts.regular, size: 7.5, lineHeight: 10 },
   ];
   const blockHeight = lines.reduce((total, line) => total + line.lineHeight, 0);
   let top = row.top + (row.height - blockHeight) / 2;
@@ -226,7 +224,7 @@ function drawBoxText({ canvas, box, colors, detail }) {
   const { page, fonts, layout } = canvas;
   const textLeft = box.x + ACCENT_WIDTH;
   const textWidth = box.width - ACCENT_WIDTH;
-  const lines = buildTextLines({ box, fonts, colors, detail, maxWidth: textWidth - BOX_PADDING * 2 });
+  const lines = buildTextLines({ box, fonts, colors, detail, language: canvas.language, maxWidth: textWidth - BOX_PADDING * 2 });
   const blockHeight = lines.reduce((total, line) => total + line.lineHeight, 0);
   let top = box.y + (box.height - blockHeight) / 2;
   for (const line of lines) {
@@ -242,7 +240,7 @@ function drawBoxText({ canvas, box, colors, detail }) {
   }
 }
 
-function buildTextLines({ box, fonts, colors, detail, maxWidth }) {
+function buildTextLines({ box, fonts, colors, detail, language, maxWidth }) {
   const { person } = box;
   const nameLines = fitLines({ text: person.name, font: fonts.bold, size: 9.5, maxWidth, maxLines: 2 });
   const lines = nameLines.map((text) => ({ text, font: fonts.bold, size: 9.5, lineHeight: 11.5, color: colors.text }));
@@ -250,11 +248,11 @@ function buildTextLines({ box, fonts, colors, detail, maxWidth }) {
     lines.push({ text: person.lifespan, font: fonts.regular, size: 8.5, lineHeight: 10.5, color: colors.mutedText });
   }
   if (detail === 'detailed' && person.birthPlace) {
-    const [placeLine] = fitLines({ text: `b. ${person.birthPlace}`, font: fonts.regular, size: 7.5, maxWidth, maxLines: 1 });
+    const [placeLine] = fitLines({ text: `${language.birthPrefix} ${person.birthPlace}`, font: fonts.regular, size: 7.5, maxWidth, maxLines: 1 });
     lines.push({ text: placeLine, font: fonts.regular, size: 7.5, lineHeight: 9.5, color: colors.mutedText });
   }
   if (box.isRepeat) {
-    lines.push({ text: 'see above', font: fonts.regular, size: 7.5, lineHeight: 9.5, color: colors.mutedText });
+    lines.push({ text: language.seeAbove, font: fonts.regular, size: 7.5, lineHeight: 9.5, color: colors.mutedText });
   }
   return lines;
 }

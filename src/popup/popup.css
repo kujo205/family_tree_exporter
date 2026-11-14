@@ -32,7 +32,7 @@ h1 { margin: 0; font-size: 13px; font-weight: 600; }
   padding: 8px 10px; background: var(--field); color: var(--text);
   border: 1px solid var(--line); border-radius: 4px; font: inherit;
 }
-.card > .control { width: 100%; }
+.card > .control, #pdf-options > .control { width: 100%; }
 select.control {
   appearance: none;
   padding-right: 30px;

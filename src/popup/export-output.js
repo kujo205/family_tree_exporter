@@ -1,4 +1,5 @@
 import { getColorScheme } from '../pdf/color-schemes.js';
+import { getLanguage } from '../pdf/languages.js';
 import { renderPortraitPdf } from '../pdf/render-portrait-pdf.js';
 
 /**
@@ -6,6 +7,7 @@ import { renderPortraitPdf } from '../pdf/render-portrait-pdf.js';
  * @property {'portrait-pdf' | 'json'} format
  * @property {string} colorSchemeId
  * @property {'compact' | 'detailed'} detail
+ * @property {string} languageId
  */
 
 /**
@@ -25,6 +27,7 @@ export async function exportTree({ tree, settings }) {
     tree,
     colorScheme: getColorScheme(settings.colorSchemeId),
     detail: settings.detail,
+    language: getLanguage(settings.languageId),
     fontBytes: await loadFontBytes(),
     exportedAt: new Date(),
   });

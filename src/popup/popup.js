@@ -1,5 +1,6 @@
 import { CRAWL_EVENT, CRAWL_PORT_NAME, GET_START_OPTIONS } from '../messaging/messages.js';
 import { listColorSchemes, pickPreviewColors } from '../pdf/color-schemes.js';
+import { listLanguages } from '../pdf/languages.js';
 import { exportTree } from './export-output.js';
 
 const DEFAULT_COLOR_SCHEME_ID = 'classic';
@@ -10,6 +11,7 @@ const generationLimitRadio = document.getElementById('generation-limit');
 const formatGroup = document.getElementById('format-group');
 const pdfOptions = document.getElementById('pdf-options');
 const colorSchemeGrid = document.getElementById('color-schemes');
+const languageSelect = document.getElementById('language');
 const exportButton = document.getElementById('export');
 const cancelButton = document.getElementById('cancel');
 const progressBar = document.getElementById('progress');
@@ -19,6 +21,7 @@ let activeTabId = 0;
 let crawlPort = undefined;
 
 colorSchemeGrid.replaceChildren(...listColorSchemes().map(toSwatchElement));
+languageSelect.replaceChildren(...listLanguages().map(toLanguageOption));
 generationsInput.addEventListener('focus', selectGenerationLimit);
 formatGroup.addEventListener('change', showOptionsForFormat);
 exportButton.addEventListener('click', startExport);
@@ -57,6 +60,13 @@ function toSwatchElement(scheme) {
   preview.style.setProperty('--swatch-fill', colors.fill);
   preview.style.setProperty('--swatch-accent', colors.accent);
   return label;
+}
+
+function toLanguageOption({ id, name }) {
+  const element = document.createElement('option');
+  element.value = id;
+  element.textContent = name;
+  return element;
 }
 
 function showOptionsForFormat() {
@@ -122,6 +132,7 @@ function readExportSettings() {
     format: readChoice('format'),
     colorSchemeId: readChoice('color-scheme'),
     detail: readChoice('detail'),
+    languageId: languageSelect.value,
   };
 }
 
