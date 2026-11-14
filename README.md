@@ -28,7 +28,7 @@ Requires [Node.js](https://nodejs.org) 18 or newer. Run `npm install`, then `npm
 
 ## Example
 
-A pedigree exported with the Classic color scheme (names blurred for privacy). Click an image to see it full size.
+A pedigree exported with the Classic color scheme. Names and years are blurred and settlements are shortened for privacy. Click an image to see it full size.
 
 [![Exported pedigree PDF](docs/example-pedigree.png)](docs/example-pedigree.png)
 
