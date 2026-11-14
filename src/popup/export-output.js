@@ -33,7 +33,7 @@ export async function exportTree({ tree, settings }) {
   });
   downloadBlob({
     blob: new Blob([bytes], { type: 'application/pdf' }),
-    filename: `${findRootName(tree)}_Pedigree_${tree.generationCount}-generations_${capitalize(settings.colorSchemeId)}.pdf`,
+    filename: `${findRootName(tree)}_Pedigree_${tree.generationCount}-generations.pdf`,
   });
 }
 
@@ -41,10 +41,6 @@ function findRootName(tree) {
   const root = tree.people.find((person) => person.id === tree.rootId);
   const safeName = (root?.name ?? '').replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
   return safeName === '' ? tree.rootId : safeName;
-}
-
-function capitalize(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 async function loadFontBytes() {
