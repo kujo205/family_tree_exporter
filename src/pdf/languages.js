@@ -13,6 +13,7 @@
  * @property {PluralForms} people
  * @property {PluralForms} generations
  * @property {string} exportedPrefix
+ * @property {string} createdWith
  * @property {string} generationLabel
  * @property {string} seeAbove
  * @property {string} birthPrefix
@@ -32,6 +33,7 @@ const LANGUAGES = [
     people: { one: 'person', other: 'people' },
     generations: { one: 'generation', other: 'generations' },
     exportedPrefix: 'Exported',
+    createdWith: 'Created with',
     generationLabel: 'Generation',
     seeAbove: 'see above',
     birthPrefix: 'b.',
@@ -46,6 +48,7 @@ const LANGUAGES = [
     people: { one: 'людина', few: 'людини', many: 'людей', other: 'людей' },
     generations: { one: 'покоління', few: 'покоління', many: 'поколінь', other: 'покоління' },
     exportedPrefix: 'Експортовано',
+    createdWith: 'Створено за допомогою',
     generationLabel: 'Покоління',
     seeAbove: 'див. вище',
     birthPrefix: 'нар.',
@@ -60,6 +63,7 @@ const LANGUAGES = [
     people: { one: 'Person', other: 'Personen' },
     generations: { one: 'Generation', other: 'Generationen' },
     exportedPrefix: 'Exportiert am',
+    createdWith: 'Erstellt mit',
     generationLabel: 'Generation',
     seeAbove: 'siehe oben',
     birthPrefix: 'geb.',
@@ -74,6 +78,7 @@ const LANGUAGES = [
     people: { one: 'persona', other: 'personas' },
     generations: { one: 'generación', other: 'generaciones' },
     exportedPrefix: 'Exportado el',
+    createdWith: 'Creado con',
     generationLabel: 'Generación',
     seeAbove: 'ver arriba',
     birthPrefix: 'n.',

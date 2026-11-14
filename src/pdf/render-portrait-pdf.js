@@ -4,6 +4,10 @@ import { formatExportedLine, formatGenerationNumber, formatRelation, formatSubti
 import { parseHex, pickAccentColor, pickBandColor, pickBoxColors } from './color-schemes.js';
 import { layoutPortraitTree } from './portrait-layout.js';
 
+const PROJECT_NAME = 'Family Tree Exporter';
+const PROJECT_URL = 'https://github.com/kujo205/family_tree_exporter';
+const FOOTER_SIZE = 8;
+const FOOTER_BASELINE = 12;
 const MAX_PAGE_SIZE = 14400;
 const BOX_PADDING = 6;
 const CORNER_RADIUS = 6;
@@ -42,6 +46,7 @@ export async function renderPortraitPdf({ tree, colorScheme, detail, language, f
   drawLinks(canvas);
   drawBoxes({ canvas, detail });
   linkBannerToStartPerson({ canvas, tree });
+  drawFooter(canvas);
   shrinkToFitPageLimit({ page, layout });
 
   return document.save();
@@ -163,6 +168,26 @@ function drawBoxes({ canvas, detail }) {
       url: personUrl(box.person.id),
     });
   }
+}
+
+function drawFooter(canvas) {
+  const { page, fonts, layout, colorScheme, language } = canvas;
+  const text = `${language.createdWith} ${PROJECT_NAME}  ·  ${PROJECT_URL.replace('https://', '')}`;
+  const textWidth = fonts.regular.widthOfTextAtSize(text, FOOTER_SIZE);
+  const x = layout.width - layout.margin - textWidth;
+  page.drawText(text, {
+    x,
+    y: FOOTER_BASELINE,
+    font: fonts.regular,
+    size: FOOTER_SIZE,
+    color: toColor(colorScheme.mutedText),
+    opacity: 0.85,
+  });
+  addLinkAnnotation({
+    canvas,
+    area: { x, y: layout.height - FOOTER_BASELINE - FOOTER_SIZE - 2, width: textWidth, height: FOOTER_SIZE + 4 },
+    url: PROJECT_URL,
+  });
 }
 
 function linkBannerToStartPerson({ canvas, tree }) {
