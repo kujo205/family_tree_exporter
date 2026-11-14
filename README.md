@@ -2,6 +2,8 @@
 
 A Chrome extension that exports your FamilySearch ancestors as a PDF pedigree chart.
 
+<img src="docs/popup.png" alt="The extension popup" width="320">
+
 ## Install
 
 The ready-to-use extension is the [`dist`](dist) folder, so no build is needed.
@@ -23,6 +25,14 @@ Requires [Node.js](https://nodejs.org) 18 or newer. Run `npm install`, then `npm
 2. Click the extension icon.
 3. Pick the person to start from (the open page or yourself), the number of generations (all or a limit), the format, color, detail and language.
 4. Click **Export**. The file downloads when the crawl finishes.
+
+## Example
+
+A pedigree exported with the Classic color scheme (names blurred for privacy). Click an image to see it full size.
+
+[![Exported pedigree PDF](docs/example-pedigree.png)](docs/example-pedigree.png)
+
+[![Close-up of the lower generations](docs/example-closeup.png)](docs/example-closeup.png)
 
 ## Features
 
