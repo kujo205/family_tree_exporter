@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Family Tree Exporter</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Family Tree Exporter</h1>
+    </header>
+
+    <section class="card">
+      <label class="field-label" for="start-person">Start from</label>
+      <select id="start-person" class="control"></select>
+
+      <span class="field-label">Generations</span>
+      <div class="segmented stacked">
+        <label><input type="radio" name="generation-mode" value="all" checked /><span>All available</span></label>
+        <label>
+          <input type="radio" name="generation-mode" value="limit" id="generation-limit" />
+          <span>Up to
+            <input id="generations" class="control limit-input" type="number" min="1" max="30" value="10" aria-label="Number of generations" />
+            generations</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <span class="field-label">Format</span>
+      <div class="segmented" id="format-group">
+        <label><input type="radio" name="format" value="portrait-pdf" checked /><span>PDF tree</span></label>
+        <label><input type="radio" name="format" value="json" /><span>JSON data</span></label>
+      </div>
+
+      <div id="pdf-options">
+        <span class="field-label">Color</span>
+        <div class="swatches" id="color-schemes"></div>
+
+        <span class="field-label">Detail</span>
+        <div class="segmented">
+          <label><input type="radio" name="detail" value="detailed" checked /><span>With birth place</span></label>
+          <label><input type="radio" name="detail" value="compact" /><span>Compact</span></label>
+        </div>
+
+        <label class="field-label" for="language">Language in PDF</label>
+        <select id="language" class="control"></select>
+      </div>
+    </section>
+
+    <button id="export" class="primary" disabled>Export</button>
+    <button id="cancel" class="secondary" hidden>Cancel</button>
+    <div id="progress" class="progress" hidden><div class="progress-bar"></div></div>
+    <div id="status" class="status"></div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -4,15 +4,18 @@ A Chrome extension that exports your FamilySearch ancestors as a PDF pedigree ch
 
 ## Install
 
-Requires [Node.js](https://nodejs.org) 18 or newer.
+The ready-to-use extension is the [`dist`](dist) folder, so no build is needed.
 
-1. Clone this repo and open the folder in a terminal.
-2. Run `npm install`, then `npm run build`. This creates a `dist/` folder.
-3. Open `chrome://extensions` in Chrome and turn on **Developer mode** (top right).
-4. Click **Load unpacked** and select the **`dist`** folder.
-5. Pin the extension from the puzzle-piece menu if you want it in the toolbar.
+1. Clone this repo (or download it as a ZIP and unzip it).
+2. Open `chrome://extensions` in Chrome and turn on **Developer mode** (top right).
+3. Click **Load unpacked** and select the **`dist`** folder.
+4. Pin the extension from the puzzle-piece menu if you want it in the toolbar.
 
-After pulling updates, run `npm run build` again, click the reload icon on the extension card and reload your FamilySearch tab.
+After pulling updates, click the reload icon on the extension card and reload your FamilySearch tab.
+
+## Develop
+
+Requires [Node.js](https://nodejs.org) 18 or newer. Run `npm install`, then `npm run build` to rebuild `dist/` from `src/`. `dist/` is committed, so rebuild and commit it together with source changes.
 
 ## Use
 
